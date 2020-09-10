@@ -1,0 +1,18 @@
+﻿<Window x:Class="ServerMonitoring.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServerMonitoring"
+        mc:Ignorable="d"
+        Title="서버 관리 프로그램" Height="450" Width="800">
+    <Grid>
+        <ComboBox x:Name="cb_serverList" HorizontalAlignment="Left" Height="21.929" Margin="29.482,10,0,0" VerticalAlignment="Top" Width="602.097" SelectionChanged="cb_serverList_SelectionChanged"/>
+        <Button x:Name="btn_serverSelect" Content="조회" Margin="0,387.072,712.965,10" HorizontalAlignment="Right" Width="49.553" Click="btn_serverSelect_Click"/>
+        <TextBox x:Name="tb_actionLog" HorizontalAlignment="Left" Height="318.81" Margin="29.482,57.375,0,0" VerticalAlignment="Top" 
+                 Width="731.25" AcceptsReturn="True" TextWrapping="WrapWithOverflow" HorizontalScrollBarVisibility="Visible" IsReadOnly="True"/>
+        <Button x:Name="btn_addServer" Content="추가" Margin="0,10,97.826,387.072" HorizontalAlignment="Right" Width="49.553" RenderTransformOrigin="1.066,0.442" Click="btn_addServer_Click"/>
+        <Button x:Name="btn_deleteServer" Content="삭제" Margin="0,10,31.268,387.072" HorizontalAlignment="Right" Width="49.553" RenderTransformOrigin="0.551,-1.201" Click="btn_deleteServer_Click"/>
+
+    </Grid>
+</Window>

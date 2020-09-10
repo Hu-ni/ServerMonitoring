@@ -1,0 +1,15 @@
+﻿<Window x:Class="ServerMonitoring.Views.AddServerView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServerMonitoring.Views"
+        mc:Ignorable="d"
+        Title="서버 추가" Height="264.623" Width="347.17">
+    <Grid Margin="0,0,2,0">
+        <TextBox x:Name="tb_url" HorizontalAlignment="Left" Height="58.019" Margin="32.792,43.755,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="270.284"/>
+        <Button x:Name="btn_add" Content="확인" HorizontalAlignment="Left" Height="58.019" Margin="32.792,135.076,0,0" VerticalAlignment="Top" Width="117.453" Click="btn_add_Click"/>
+        <Button x:Name="btn_cancel" Content="취소" HorizontalAlignment="Left" Height="58.019" Margin="185.623,135.076,0,0" VerticalAlignment="Top" Width="117.453" Click="btn_cancel_Click"/>
+
+    </Grid>
+</Window>
