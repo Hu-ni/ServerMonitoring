@@ -48,8 +48,8 @@ namespace ServerMonitoring.Views
                 return;
             for (int i = 0; i < serverList.Count; i++)
             {
-                string status = server.SelectServerStatus(i);
-                PrintLog("현재 " + status + "상태입니다.");
+                ServerInfo status = server.SelectServerStatus(i);
+                PrintLog("현재 " + status.Url + "의 상태는" + status.StatusText + "입니다.");
             }
         }
 
@@ -82,8 +82,8 @@ namespace ServerMonitoring.Views
 
         private void btn_serverSelect_Click(object sender, RoutedEventArgs e)
         {
-            string status = server.SelectServerStatus(cb_serverList.SelectedIndex);
-            PrintLog("현재 " + status + "상태입니다.");
+            ServerInfo status = server.SelectServerStatus(cb_serverList.SelectedIndex);
+            PrintLog("현재 " + status.Url+ "의 상태는" + status.StatusText + "입니다.");
         }
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -94,7 +94,7 @@ namespace ServerMonitoring.Views
 
         private void PrintLog(string message)
         {
-            tb_actionLog.Text += message + "\n";
+            tb_actionLog.Text += DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ") + message + "\n";
         }
     }
 }

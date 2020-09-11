@@ -24,6 +24,9 @@ namespace ServerMonitoring.ViewModels
 
         private string txtFilePath = @"./server.txt";
         private string statusUrl = "/statustest.html";
+        private string sendPhonenumber = "010-4498-2002";
+        private string defaultPhonenumber = "010-7470-0449";
+
         public ServerStatusViewModel()
         {
             servers = new List<ServerInfo>();
@@ -32,23 +35,22 @@ namespace ServerMonitoring.ViewModels
             {
                 ApiKey = "NCS2KLXFSFWXM0UQ",
                 ApiSecret = "B93XWVJNUX57C2HEPILF5OOVHZF170KI",
-                DefaultSenderId = "010-7470-0449"
+                DefaultSenderId = defaultPhonenumber
             });
         }
 
-        public string SelectServerStatus(int index)
+        public ServerInfo SelectServerStatus(int index)
         {
 
             string htmlText = client.DownloadString(servers[index].Url + statusUrl);
-            
             if(htmlText.Contains("DB Success"))
             {
                 servers[index].StatusText = "DB Success";
             }
-            else if(htmlText.Contains("DB Failed"))
+            else if(htmlText.Contains("DB Fail"))
             {
-                servers[index].StatusText = "DB Failed";
-                api.SendMessageAsync("010-7470-0449", "현재" + servers[index].Url + "의 DB 서버 상태에 문제가 발생했습니다!");
+                servers[index].StatusText = "DB Error";
+                api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 DB 서버 상태에 문제가 발생했습니다!");
             }
             else
             {
@@ -59,7 +61,7 @@ namespace ServerMonitoring.ViewModels
                 options.DontFragment = true;
 
                 //전송할 데이터를 입력
-                string data = "aaaaaaaaaaaaaa";
+                string data = "Test Data";
                 byte[] buffer = ASCIIEncoding.ASCII.GetBytes(data);
                 int timeout = 120;
 
@@ -69,20 +71,20 @@ namespace ServerMonitoring.ViewModels
                 if (reply.Status == IPStatus.Success)
                 {
                     Console.WriteLine("Succeess");
-                    servers[index].StatusText = "Apach";
+                    servers[index].StatusText = "Apach Error";
 
-                    api.SendMessageAsync("010-7470-0449", servers[index].Url + "의 아파치 서버가 종료된 상태입니다!");
+                    api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 아파치 서버가 종료된 상태입니다!");
                 }
                 else
                 {
                     Console.WriteLine("Fail");
-                    servers[index].StatusText = "Server Down";
+                    servers[index].StatusText = "Server Error";
 
-                    api.SendMessageAsync("010-7470-0449", servers[index].Url + "서버가 종료된 상태입니다!");
+                    api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 서버가 종료된 상태입니다!");
                 }
             }
 
-            return servers[index].StatusText;
+            return servers[index];
         }
 
         public List<ServerInfo> GetAllServer()
