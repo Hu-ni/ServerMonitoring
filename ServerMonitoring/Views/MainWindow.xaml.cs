@@ -53,11 +53,13 @@ namespace ServerMonitoring.Views
             }
         }
 
-        private void RefreshServerList()
+        public void RefreshServerList()
         {
             List<ComboBoxItem> items = new List<ComboBoxItem>();
 
             List<ServerInfo> serverList = server.GetAllServer();
+            if (serverList == null)
+                return;
             for (int i = 0; i < serverList.Count; i++)
             {
                 items.Add(new ComboBoxItem() { Content = serverList[i].Url });
@@ -70,13 +72,12 @@ namespace ServerMonitoring.Views
             AddServerView addServerView = new AddServerView();
             addServerView.main = this;
             addServerView.Show();
-
-            RefreshServerList();
         }
 
         private void btn_deleteServer_Click(object sender, RoutedEventArgs e)
         {
             server.DeleteServer(cb_serverList.SelectedIndex);
+            RefreshServerList();
         }
 
         private void btn_serverSelect_Click(object sender, RoutedEventArgs e)
@@ -87,7 +88,8 @@ namespace ServerMonitoring.Views
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PrintLog(((ComboBoxItem)cb_serverList.SelectedItem).Content + "를 선택했습니다.");
+            if(cb_serverList.SelectedItem != null)
+                PrintLog(((ComboBoxItem)cb_serverList.SelectedItem).Content + "를 선택했습니다.");
         }
 
         private void PrintLog(string message)

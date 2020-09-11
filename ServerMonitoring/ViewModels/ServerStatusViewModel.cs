@@ -6,6 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Mail;
+using CoolSms;
+using System.Net.NetworkInformation;
 
 namespace ServerMonitoring.ViewModels
 {
@@ -17,20 +20,27 @@ namespace ServerMonitoring.ViewModels
     {
         private List<ServerInfo> servers;
         private WebClient client;
+        private SmsApi api;
 
         private string txtFilePath = @"./server.txt";
-
+        private string statusUrl = "/statustest.html";
         public ServerStatusViewModel()
         {
             servers = new List<ServerInfo>();
             client = new WebClient();
+            api = new SmsApi(new SmsApiOptions
+            {
+                ApiKey = "NCS2KLXFSFWXM0UQ",
+                ApiSecret = "B93XWVJNUX57C2HEPILF5OOVHZF170KI",
+                DefaultSenderId = "010-7470-0449"
+            });
         }
 
         public string SelectServerStatus(int index)
         {
 
-            string htmlText = client.DownloadString(servers[index].Url);
-
+            string htmlText = client.DownloadString(servers[index].Url + statusUrl);
+            
             if(htmlText.Contains("DB Success"))
             {
                 servers[index].StatusText = "DB Success";
@@ -38,10 +48,38 @@ namespace ServerMonitoring.ViewModels
             else if(htmlText.Contains("DB Failed"))
             {
                 servers[index].StatusText = "DB Failed";
+                api.SendMessageAsync("010-7470-0449", "현재" + servers[index].Url + "의 DB 서버 상태에 문제가 발생했습니다!");
             }
             else
             {
-                servers[index].StatusText = "Test";
+
+                Ping ping = new Ping();
+                PingOptions options = new PingOptions();
+
+                options.DontFragment = true;
+
+                //전송할 데이터를 입력
+                string data = "aaaaaaaaaaaaaa";
+                byte[] buffer = ASCIIEncoding.ASCII.GetBytes(data);
+                int timeout = 120;
+
+                //IP 주소를 입력
+                PingReply reply = ping.Send(servers[index].Url.Replace("http://",""), timeout, buffer, options);
+
+                if (reply.Status == IPStatus.Success)
+                {
+                    Console.WriteLine("Succeess");
+                    servers[index].StatusText = "Apach";
+
+                    api.SendMessageAsync("010-7470-0449", servers[index].Url + "의 아파치 서버가 종료된 상태입니다!");
+                }
+                else
+                {
+                    Console.WriteLine("Fail");
+                    servers[index].StatusText = "Server Down";
+
+                    api.SendMessageAsync("010-7470-0449", servers[index].Url + "서버가 종료된 상태입니다!");
+                }
             }
 
             return servers[index].StatusText;
@@ -49,12 +87,11 @@ namespace ServerMonitoring.ViewModels
 
         public List<ServerInfo> GetAllServer()
         {
-            servers = null;
-            if (!File.Exists(@"./server.txt"))
+            if (!File.Exists(txtFilePath))
                 return servers;
 
             servers = new List<ServerInfo>();
-            string[] serverTxt = File.ReadAllText(@"./server.txt").Split('\n');
+            string[] serverTxt = File.ReadAllText(txtFilePath).Split('\n');
 
             for(int i = 0; i < serverTxt.Length; i++)
             {
@@ -66,10 +103,10 @@ namespace ServerMonitoring.ViewModels
 
         public void AddServer(string url)
         {
-            if (File.Exists(@"./server.txt"))
-                File.AppendAllText(@"./server.txt", "\n" + url);
+            if (File.Exists(txtFilePath))
+                File.AppendAllText(txtFilePath, "\n" + url);
             else
-                File.WriteAllText(@"./server.txt", url);
+                File.WriteAllText(txtFilePath, url);
 
             servers.Add(new ServerInfo(url));
             return;
@@ -77,10 +114,10 @@ namespace ServerMonitoring.ViewModels
 
         public bool DeleteServer(int index)
         {
-            if (!File.Exists(@"./server.txt") || index >= servers.Count)
+            if (!File.Exists(txtFilePath) || index >= servers.Count)
                 return false;
 
-            string serverTxt = File.ReadAllText(@"./server.txt").Replace(servers[index].Url + "\n", null);
+            string serverTxt = File.ReadAllText(txtFilePath).Replace(servers[index].Url + "\n", null);
 
             File.WriteAllText(txtFilePath, serverTxt);
             servers.RemoveAt(index);

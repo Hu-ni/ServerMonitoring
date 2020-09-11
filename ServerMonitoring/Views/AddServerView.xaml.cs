@@ -30,6 +30,7 @@ namespace ServerMonitoring.Views
         private void btn_add_Click(object sender, RoutedEventArgs e)
         {
             main.Server.AddServer(tb_url.Text.Trim());
+            main.RefreshServerList();
             this.Close();
         }
 
