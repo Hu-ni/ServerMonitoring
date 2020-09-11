@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerMonitoring"
         mc:Ignorable="d"
-        Title="서버 관리 프로그램" Height="450" Width="800">
+        Title="서버 관리 프로그램" Height="450" Width="800" Closed="Window_Closed">
     <Grid>
         <ComboBox x:Name="cb_serverList" Margin="29,10,160,375" SelectionChanged="cb_serverList_SelectionChanged"/>
         <Button x:Name="btn_serverSelect" Content="조회" Margin="29,376,678,10" Click="btn_serverSelect_Click"/>
-        <TextBox x:Name="tb_actionLog" Margin="29,52,31,48" AcceptsReturn="True" TextWrapping="WrapWithOverflow" HorizontalScrollBarVisibility="Visible" IsReadOnly="True"/>
+        <TextBox x:Name="tb_actionLog" Margin="29,52,31,48" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"  TextWrapping="WrapWithOverflow" IsReadOnly="True"/>
         <Button x:Name="btn_addServer" Content="추가" Margin="645,10,98,375" RenderTransformOrigin="1.066,0.442" Click="btn_addServer_Click"/>
         <Button x:Name="btn_deleteServer" Content="삭제" Margin="711,10,31,375" RenderTransformOrigin="0.551,-1.201" Click="btn_deleteServer_Click"/>
 

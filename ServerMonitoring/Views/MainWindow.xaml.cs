@@ -3,6 +3,7 @@ using ServerMonitoring.ViewModels;
 using ServerMonitoring.Views;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,13 +44,16 @@ namespace ServerMonitoring.Views
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            List<ServerInfo> serverList = server.GetAllServer();
-            if (serverList.Count == 0)
-                return;
-            for (int i = 0; i < serverList.Count; i++)
+            if(DateTime.Now.DayOfWeek.Equals("Saturday") || DateTime.Now.DayOfWeek.Equals("Sunday"))
             {
-                ServerInfo status = server.SelectServerStatus(i);
-                PrintLog("현재 " + status.Url + "의 상태는" + status.StatusText + "입니다.");
+                List<ServerInfo> serverList = server.GetAllServer();
+                if (serverList.Count == 0)
+                    return;
+                for (int i = 0; i < serverList.Count; i++)
+                {
+                    ServerInfo status = server.SelectServerStatus(i);
+                    PrintLog("현재 " + status.Url + "의 상태는" + status.StatusText + "입니다.");
+                }
             }
         }
 
@@ -95,6 +99,11 @@ namespace ServerMonitoring.Views
         private void PrintLog(string message)
         {
             tb_actionLog.Text += DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ") + message + "\n";
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
         }
     }
 }
