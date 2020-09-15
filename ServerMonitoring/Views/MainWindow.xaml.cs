@@ -3,6 +3,7 @@ using ServerMonitoring.ViewModels;
 using ServerMonitoring.Views;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,12 @@ namespace ServerMonitoring.Views
             timer.Tick += new EventHandler(timer_Tick);
             timer.Start();
 
+
+        }
+
+        private void P_Exited(object sender, EventArgs e)
+        {
+            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -52,7 +59,7 @@ namespace ServerMonitoring.Views
                 for (int i = 0; i < serverList.Count; i++)
                 {
                     ServerInfo status = server.SelectServerStatus(i);
-                    PrintLog("현재 " + status.Url + "의 상태는" + status.StatusText + "입니다.");
+                    PrintLog("현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.");
                 }
             }
         }
@@ -66,7 +73,7 @@ namespace ServerMonitoring.Views
                 return;
             for (int i = 0; i < serverList.Count; i++)
             {
-                items.Add(new ComboBoxItem() { Content = serverList[i].Url });
+                items.Add(new ComboBoxItem() { Content = serverList[i].Name });
             }
             cb_serverList.ItemsSource = items;
         }
@@ -87,7 +94,7 @@ namespace ServerMonitoring.Views
         private void btn_serverSelect_Click(object sender, RoutedEventArgs e)
         {
             ServerInfo status = server.SelectServerStatus(cb_serverList.SelectedIndex);
-            PrintLog("현재 " + status.Url+ "의 상태는" + status.StatusText + "입니다.");
+            PrintLog("현재 " + status.Name+ "의 상태는 \"" + status.StatusText + "\"입니다.");
         }
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)

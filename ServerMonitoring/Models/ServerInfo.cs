@@ -8,16 +8,25 @@ namespace ServerMonitoring.Models
 {
     class ServerInfo
     {
-        private string url;
-        private string statusText;
+        private string _name;
+        private string _url;
+        private bool _isDBAccess;
+        private string _dbUrl;
+        private string _statusText;
 
-        public string Url { get => url; private set => url = value; }
-        public string StatusText { get => statusText; set => statusText = value; }
+        public string Name { get => _name; private set => _name = value; }
+        public string Url { get => _url; private set => _url = value; }
+        public bool IsDBAccess { get => _isDBAccess; private set => _isDBAccess = value; }
+        public string DbUrl { get => _dbUrl; private set => _dbUrl = value; }
+        public string StatusText { get => _statusText; set => _statusText = value; }
 
-        public ServerInfo(string url, string statusText = null)
+        public ServerInfo(string name, string url, bool isDBAccess, string dbUrl)
         {
-            this.url = url ?? throw new ArgumentNullException(nameof(url));
-            this.statusText = statusText;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Url = url ?? throw new ArgumentNullException(nameof(url));
+            IsDBAccess = isDBAccess;
+            DbUrl = dbUrl ?? throw new ArgumentNullException(nameof(dbUrl));
+            StatusText = "";
         }
     }
 }

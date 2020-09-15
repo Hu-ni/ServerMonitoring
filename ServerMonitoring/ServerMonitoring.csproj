@@ -64,6 +64,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Styles\placeholderTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AddServerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -76,8 +80,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Exception\ServerStatusException.cs" />
+    <Compile Include="Exceptions\ServerStatusException.cs" />
     <Compile Include="Models\ServerInfo.cs" />
+    <Compile Include="Models\ServerXmlFIle.cs" />
     <Compile Include="ViewModels\ServerStatusViewModel.cs" />
     <Compile Include="Views\AddServerView.xaml.cs">
       <DependentUpon>AddServerView.xaml</DependentUpon>

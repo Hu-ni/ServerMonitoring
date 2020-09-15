@@ -19,17 +19,18 @@ namespace ServerMonitoring.ViewModels
     class ServerStatusViewModel
     {
         private List<ServerInfo> servers;
+        private ServerXmlFile xml;
         private WebClient client;
         private SmsApi api;
 
-        private string txtFilePath = @"./server.txt";
-        private string statusUrl = "/statustest.html";
+        private string xmlFilePath = @"./server.xml";
         private string sendPhonenumber = "010-4498-2002";
         private string defaultPhonenumber = "010-7470-0449";
 
         public ServerStatusViewModel()
         {
-            servers = new List<ServerInfo>();
+            xml = new ServerXmlFile(xmlFilePath);
+            servers = xml.LoadFile();
             client = new WebClient();
             api = new SmsApi(new SmsApiOptions
             {
@@ -41,20 +42,40 @@ namespace ServerMonitoring.ViewModels
 
         public ServerInfo SelectServerStatus(int index)
         {
-
-            string htmlText = client.DownloadString(servers[index].Url + statusUrl);
-            if(htmlText.Contains("DB Success"))
+            //IP 주소를 입력
+            string address = servers[index].Url;
+            if (address.Contains("https://"))
             {
-                servers[index].StatusText = "DB Success";
+                address = address.Replace("https://", "");
             }
-            else if(htmlText.Contains("DB Fail"))
+            else if(address.Contains("http://"))
             {
-                servers[index].StatusText = "DB Error";
-                api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 DB 서버 상태에 문제가 발생했습니다!");
+                address = address.Replace("http://", "");
             }
-            else
+            try
             {
+                string htmlText = client.DownloadString("http://" + address + servers[index].DbUrl);
+                servers[index].StatusText = "";
+                if (servers[index].IsDBAccess)
+                {
+                    if (htmlText.Contains("DB Success"))
+                    {
+                        servers[index].StatusText += "Working";
+                    }
+                    else if (htmlText.Contains("DB Fail"))
+                    {
+                        servers[index].StatusText += "DB Error";
+                        api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가" + servers[index].StatusText + "상태입니다! DB 서버를 확인해주세요!");
 
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
+            catch (Exception)
+            {
                 Ping ping = new Ping();
                 PingOptions options = new PingOptions();
 
@@ -62,25 +83,19 @@ namespace ServerMonitoring.ViewModels
 
                 //전송할 데이터를 입력
                 string data = "Test Data";
-                byte[] buffer = ASCIIEncoding.ASCII.GetBytes(data);
+                byte[] buffer = Encoding.ASCII.GetBytes(data);
                 int timeout = 120;
 
-                //IP 주소를 입력
-                PingReply reply = ping.Send(servers[index].Url.Replace("http://",""), timeout, buffer, options);
-
+                PingReply reply = ping.Send(address, timeout, buffer, options);
                 if (reply.Status == IPStatus.Success)
                 {
-                    Console.WriteLine("Succeess");
-                    servers[index].StatusText = "Apach Error";
-
-                    api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 아파치 서버가 종료된 상태입니다!");
+                    servers[index].StatusText += "Apache Error";
+                    api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가 " +  servers[index].StatusText +"상태입니다! Apache를 확인해주세요!");
                 }
                 else
                 {
-                    Console.WriteLine("Fail");
-                    servers[index].StatusText = "Server Error";
-
-                    api.SendMessageAsync(sendPhonenumber, servers[index].Url + "의 서버가 종료된 상태입니다!");
+                    servers[index].StatusText += "Server Error";
+                    api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가 " + servers[index].StatusText +"상태입니다! 서버를 재가동 시켜주세요!");
                 }
             }
 
@@ -89,41 +104,23 @@ namespace ServerMonitoring.ViewModels
 
         public List<ServerInfo> GetAllServer()
         {
-            if (!File.Exists(txtFilePath))
-                return servers;
-
-            servers = new List<ServerInfo>();
-            string[] serverTxt = File.ReadAllText(txtFilePath).Split('\n');
-
-            for(int i = 0; i < serverTxt.Length; i++)
-            {
-                servers.Add(new ServerInfo(serverTxt[i]));
-            }
-
             return servers;
         }
 
-        public void AddServer(string url)
+        public void AddServer(ServerInfo server)
         {
-            if (File.Exists(txtFilePath))
-                File.AppendAllText(txtFilePath, "\n" + url);
-            else
-                File.WriteAllText(txtFilePath, url);
-
-            servers.Add(new ServerInfo(url));
+            xml.AddServerToXml(server);
+            servers.Add(server);
             return;
         }
 
         public bool DeleteServer(int index)
         {
-            if (!File.Exists(txtFilePath) || index >= servers.Count)
+            if (index >= servers.Count)
                 return false;
 
-            string serverTxt = File.ReadAllText(txtFilePath).Replace(servers[index].Url + "\n", null);
-
-            File.WriteAllText(txtFilePath, serverTxt);
+            xml.RemoveServerToXml(servers[index]);
             servers.RemoveAt(index);
-
             return true;
         }
     }

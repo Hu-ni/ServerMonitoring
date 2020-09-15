@@ -5,11 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerMonitoring.Views"
         mc:Ignorable="d"
-        Title="서버 추가" Height="229.52" Width="347.17">
-    <Grid Margin="0,0,2,0">
-        <TextBox x:Name="tb_url" HorizontalAlignment="Left" Height="58.019" Margin="32.792,43.755,0,0" TextWrapping="Wrap" Text="http://" VerticalAlignment="Top" Width="270.284"/>
-        <Button x:Name="btn_add" Content="확인" HorizontalAlignment="Left" Height="41" Margin="33,135,0,0" VerticalAlignment="Top" Width="117" Click="btn_add_Click"/>
-        <Button x:Name="btn_cancel" Content="취소" HorizontalAlignment="Left" Height="41" Margin="186,135,0,0" VerticalAlignment="Top" Width="117" Click="btn_cancel_Click"/>
+        Title="서버 추가" Height="286.52" Width="436.17">
+    <Grid>
+        <TextBox Style="{StaticResource placeHolder}" x:Name="tb_name" Tag="서버 이름을 적고 IP 주소를 괄호안에 넣어주세요" HorizontalAlignment="Left" Height="27.641" Margin="99,25.604,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="308"/>
+        <TextBox x:Name="tb_url" Style="{StaticResource placeHolder}" Tag="주소" HorizontalAlignment="Left" Height="27.641" Margin="99,68.604,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="308"/>
+        <RadioButton x:Name="rbtn_yes" Content="Yes" HorizontalAlignment="Left" Height="21.641" Margin="125,117,0,0" VerticalAlignment="Top" Width="91" Checked="rbtn_yes_Checked"/>
+        <RadioButton x:Name="rbtn_no" Content="No" HorizontalAlignment="Left" Height="21.641" Margin="297,117,0,0" VerticalAlignment="Top" Width="91" Checked="rbtn_no_Checked"/>
+        <TextBox x:Name="tb_dbAccessUrl" Style="{StaticResource placeHolder}" Tag="주소를 제외한 경로" HorizontalAlignment="Left" Height="27.641" Margin="99,151.604,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="308"/>
+        <Button x:Name="btn_add" Content="확인" HorizontalAlignment="Left" Height="41" Margin="36,204,0,0" VerticalAlignment="Top" Width="117" Click="btn_add_Click"/>
+        <Button x:Name="btn_cancel" Content="취소" HorizontalAlignment="Left" Height="41" Margin="290,204,0,0" VerticalAlignment="Top" Width="117" Click="btn_cancel_Click"/>
+        <Label Content="Name" HorizontalAlignment="Left" Height="27.641" Margin="36,25.604,0,0" VerticalAlignment="Top" Width="46"/>
+        <Label Content="URL" HorizontalAlignment="Left" Height="27.641" Margin="36,68.604,0,0" VerticalAlignment="Top" Width="46"/>
+        <Label Content="DB Access" HorizontalAlignment="Left" Height="27.641" Margin="10,111,0,0" VerticalAlignment="Top" Width="72"/>
+        <Label Content="Access URL" HorizontalAlignment="Left" Height="27.641" Margin="10,151.604,0,0" VerticalAlignment="Top" Width="72"/>
 
     </Grid>
 </Window>

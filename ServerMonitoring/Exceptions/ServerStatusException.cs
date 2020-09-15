@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerMonitoring.Exception
+namespace ServerMonitoring.Exceptions
 {
     [System.Serializable]
     public class ServerStatusException : System.Exception
