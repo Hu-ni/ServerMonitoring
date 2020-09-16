@@ -37,11 +37,9 @@ namespace ServerMonitoring.Views
             RefreshServerList();
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromHours(1);
+            timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += new EventHandler(timer_Tick);
             timer.Start();
-
-
         }
 
         private void P_Exited(object sender, EventArgs e)
@@ -51,8 +49,8 @@ namespace ServerMonitoring.Views
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            if(DateTime.Now.DayOfWeek.Equals("Saturday") || DateTime.Now.DayOfWeek.Equals("Sunday"))
-            {
+            //if(DateTime.Now.DayOfWeek.Equals("Saturday") || DateTime.Now.DayOfWeek.Equals("Sunday"))
+            //{
                 List<ServerInfo> serverList = server.GetAllServer();
                 if (serverList.Count == 0)
                     return;
@@ -61,7 +59,7 @@ namespace ServerMonitoring.Views
                     ServerInfo status = server.SelectServerStatus(i);
                     PrintLog("현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.");
                 }
-            }
+            //}
         }
 
         public void RefreshServerList()

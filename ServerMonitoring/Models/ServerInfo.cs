@@ -22,7 +22,10 @@ namespace ServerMonitoring.Models
 
         public ServerInfo(string name, string url, bool isDBAccess, string dbUrl)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
+            if (name.Equals(""))
+                Name = url;
+            else
+                Name = name ?? throw new ArgumentNullException(nameof(name));
             Url = url ?? throw new ArgumentNullException(nameof(url));
             IsDBAccess = isDBAccess;
             DbUrl = dbUrl ?? throw new ArgumentNullException(nameof(dbUrl));
