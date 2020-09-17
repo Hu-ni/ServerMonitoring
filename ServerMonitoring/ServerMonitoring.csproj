@@ -64,10 +64,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Styles\ListBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Styles\placeholderTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -87,6 +83,8 @@
     <Compile Include="Exceptions\ServerStatusException.cs" />
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Models\ServerXmlFIle.cs" />
+    <Compile Include="Models\SMSInfo.cs" />
+    <Compile Include="ViewModels\Class1.cs" />
     <Compile Include="ViewModels\ServerStatusViewModel.cs" />
     <Compile Include="Views\AddServerView.xaml.cs">
       <DependentUpon>AddServerView.xaml</DependentUpon>
