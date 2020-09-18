@@ -27,19 +27,29 @@ namespace ServerMonitoring.Views
     public partial class MainWindow : Window
     {
         private ServerStatusViewModel server;
+        private SmsManagementViewModel sms;
+
+        private string _name;
 
         internal ServerStatusViewModel Server { get => server; private set => server = value; }
 
         public MainWindow()
         {
             InitializeComponent();
+            
             server = new ServerStatusViewModel();
+            sms = new SmsManagementViewModel();
+
             RefreshServerList();
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMinutes(1);
+            timer.Interval = TimeSpan.FromMinutes(10);
             timer.Tick += new EventHandler(timer_Tick);
             timer.Start();
+            Process.GetCurrentProcess().Exited += P_Exited;
+
+            _name = "웹&솔루션 사업팀";
+            //_name = "박훈";
         }
 
         private void P_Exited(object sender, EventArgs e)
@@ -49,17 +59,23 @@ namespace ServerMonitoring.Views
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            //if(DateTime.Now.DayOfWeek.Equals("Saturday") || DateTime.Now.DayOfWeek.Equals("Sunday"))
-            //{
-                List<ServerInfo> serverList = server.GetAllServer();
-                if (serverList.Count == 0)
-                    return;
-                for (int i = 0; i < serverList.Count; i++)
+            List<ServerInfo> serverList = server.GetAllServer();
+            if (serverList.Count == 0)
+                return;
+            for (int i = 0; i < serverList.Count; i++)
+            {
+                ServerInfo status = server.SelectServerStatus(i);
+                string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
+                PrintLog(log);
+
+                if (!status.StatusText.Equals("Working"))
                 {
-                    ServerInfo status = server.SelectServerStatus(i);
-                    PrintLog("현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.");
+                    if (sms.SendSms(_name, log))
+                        PrintLog("문자를 성공적으로 전송했습니다.");
+                    else
+                        PrintLog("문자 전송에 실패했습니다.");
                 }
-            //}
+            }
         }
 
         public void RefreshServerList()
@@ -92,7 +108,16 @@ namespace ServerMonitoring.Views
         private void btn_serverSelect_Click(object sender, RoutedEventArgs e)
         {
             ServerInfo status = server.SelectServerStatus(cb_serverList.SelectedIndex);
-            PrintLog("현재 " + status.Name+ "의 상태는 \"" + status.StatusText + "\"입니다.");
+            string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
+            PrintLog(log);
+
+            if (!status.StatusText.Equals("Working"))
+            {
+                if (sms.SendSms(_name, log))
+                    PrintLog("문자를 성공적으로 전송했습니다.");
+                else
+                    PrintLog("문자 전송에 실패했습니다.");
+            }
         }
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)

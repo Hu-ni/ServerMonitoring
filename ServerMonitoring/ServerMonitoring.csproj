@@ -80,11 +80,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Exceptions\ServerStatusException.cs" />
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Models\ServerXmlFIle.cs" />
-    <Compile Include="Models\SMSInfo.cs" />
-    <Compile Include="ViewModels\Class1.cs" />
+    <Compile Include="ViewModels\SmsManagementViewModel.cs" />
     <Compile Include="ViewModels\ServerStatusViewModel.cs" />
     <Compile Include="Views\AddServerView.xaml.cs">
       <DependentUpon>AddServerView.xaml</DependentUpon>

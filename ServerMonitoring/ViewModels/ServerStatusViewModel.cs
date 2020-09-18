@@ -21,23 +21,14 @@ namespace ServerMonitoring.ViewModels
         private List<ServerInfo> servers;
         private ServerXmlFile xml;
         private WebClient client;
-        private SmsApi api;
 
-        private string xmlFilePath = @"./server.xml";
-        private string sendPhonenumber = "010-4498-2002";
-        private string defaultPhonenumber = "010-7470-0449";
+        private readonly string xmlFilePath = @"./server.xml";
 
         public ServerStatusViewModel()
         {
             xml = new ServerXmlFile(xmlFilePath);
             servers = xml.LoadFile();
             client = new WebClient();
-            api = new SmsApi(new SmsApiOptions
-            {
-                ApiKey = "NCS2KLXFSFWXM0UQ",
-                ApiSecret = "B93XWVJNUX57C2HEPILF5OOVHZF170KI",
-                DefaultSenderId = defaultPhonenumber
-            });
         }
 
         public ServerInfo SelectServerStatus(int index)
@@ -45,60 +36,50 @@ namespace ServerMonitoring.ViewModels
             //IP 주소를 입력
             string address = servers[index].Url;
             if (address.Contains("https://"))
-            {
                 address = address.Replace("https://", "");
-            }
             else if(address.Contains("http://"))
-            {
                 address = address.Replace("http://", "");
-            }
+            
             try
             {
                 string htmlText = client.DownloadString("http://" + address + servers[index].DbUrl);
                 servers[index].StatusText = "";
                 if (servers[index].IsDBAccess)
                 {
+                    Console.WriteLine(htmlText);
                     if (htmlText.Contains("DB Success"))
-                    {
                         servers[index].StatusText += "Working";
-                    }
-                    else if (htmlText.Contains("DB Fail"))
-                    {
+                    else if (htmlText.Contains("DB Fail") || htmlText.Contains("mysql_connect error"))
                         servers[index].StatusText += "DB Error";
-                        api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가" + servers[index].StatusText + "상태입니다! DB 서버를 확인해주세요!");
-
-                    }
                     else
-                    {
-                        throw new Exception();
-                    }
+                        return PingTest(address, index);
                 }
             }
             catch (Exception)
             {
-                Ping ping = new Ping();
-                PingOptions options = new PingOptions();
-
-                options.DontFragment = true;
-
-                //전송할 데이터를 입력
-                string data = "Test Data";
-                byte[] buffer = Encoding.ASCII.GetBytes(data);
-                int timeout = 120;
-
-                PingReply reply = ping.Send(address, timeout, buffer, options);
-                if (reply.Status == IPStatus.Success)
-                {
-                    servers[index].StatusText += "Apache Error";
-                    api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가 " +  servers[index].StatusText +"상태입니다! Apache를 확인해주세요!");
-                }
-                else
-                {
-                    servers[index].StatusText += "Server Error";
-                    api.SendMessageAsync(sendPhonenumber, servers[index].Name + "서버가 " + servers[index].StatusText +"상태입니다! 서버를 재가동 시켜주세요!");
-                }
+                servers[index].StatusText = "Program Error!!";
             }
 
+            return servers[index];
+        }
+
+        private ServerInfo PingTest(string address, int index)
+        {
+            Ping ping = new Ping();
+            PingOptions options = new PingOptions();
+
+            options.DontFragment = true;
+
+            //전송할 데이터를 입력
+            string data = "Test Data";
+            byte[] buffer = Encoding.ASCII.GetBytes(data);
+            int timeout = 120;
+
+            PingReply reply = ping.Send(address, timeout, buffer, options);
+            if (reply.Status == IPStatus.Success)
+                servers[index].StatusText += "Apache Error";
+            else
+                servers[index].StatusText += "Server Error";
             return servers[index];
         }
 
