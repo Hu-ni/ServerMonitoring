@@ -42,14 +42,25 @@ namespace ServerMonitoring.Views
 
             RefreshServerList();
 
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMinutes(10);
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Start();
+            DispatcherTimer tm_checkServer = new DispatcherTimer();
+            tm_checkServer.Interval = TimeSpan.FromMinutes(10);
+            tm_checkServer.Tick += new EventHandler(tm_checkServer_Tick);
+            tm_checkServer.Start();
+
+            DispatcherTimer tm_saveLog = new DispatcherTimer();
+            tm_saveLog.Interval = TimeSpan.FromMinutes(10);
+            tm_saveLog.Tick += new EventHandler(tm_saveLog_Tick);
+            tm_saveLog.Start();
             Process.GetCurrentProcess().Exited += P_Exited;
 
             _name = "웹&솔루션 사업팀";
             //_name = "박훈";
+        }
+
+        private void tm_saveLog_Tick(object sender, EventArgs e)
+        {
+            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
+            tb_actionLog.Clear();
         }
 
         private void P_Exited(object sender, EventArgs e)
@@ -57,7 +68,7 @@ namespace ServerMonitoring.Views
             File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
         }
 
-        private void timer_Tick(object sender, EventArgs e)
+        private void tm_checkServer_Tick(object sender, EventArgs e)
         {
             List<ServerInfo> serverList = server.GetAllServer();
             if (serverList.Count == 0)
@@ -134,6 +145,11 @@ namespace ServerMonitoring.Views
         private void Window_Closed(object sender, EventArgs e)
         {
             File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
+        }
+
+        private void tb_actionLog_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            tb_actionLog.ScrollToEnd();
         }
     }
 }

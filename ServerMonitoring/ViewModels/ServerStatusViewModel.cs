@@ -46,7 +46,6 @@ namespace ServerMonitoring.ViewModels
                 servers[index].StatusText = "";
                 if (servers[index].IsDBAccess)
                 {
-                    Console.WriteLine(htmlText);
                     if (htmlText.Contains("DB Success"))
                         servers[index].StatusText += "Working";
                     else if (htmlText.Contains("DB Fail") || htmlText.Contains("mysql_connect error"))
