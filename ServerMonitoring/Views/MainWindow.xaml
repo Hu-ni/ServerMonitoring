@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerMonitoring"
         mc:Ignorable="d"
-        Title="서버 관리 프로그램" Height="450" Width="800" Closed="Window_Closed">
+        Title="서버 관리 프로그램" Height="450" Width="800" Closed="Window_Closed" Closing="Window_Closing">
     <Grid>
         <ComboBox x:Name="cb_serverList" Margin="29,10,160,375" SelectionChanged="cb_serverList_SelectionChanged"/>
         <Button x:Name="btn_serverSelect" Content="조회" Margin="29,376,678,10" Click="btn_serverSelect_Click"/>

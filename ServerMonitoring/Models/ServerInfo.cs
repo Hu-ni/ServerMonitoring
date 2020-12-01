@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitoring.Models
 {
-    class ServerInfo
+    public class ServerInfo
     {
         private string _name;
         private string _url;

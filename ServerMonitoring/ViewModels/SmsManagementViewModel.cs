@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace ServerMonitoring.ViewModels
 {
-    class SmsManagementViewModel
+    public class SmsManagementViewModel
     {
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -39,53 +39,14 @@ namespace ServerMonitoring.ViewModels
         {
             _id = "01044982002";
             _pw = "cic2016*";
-            //_id = "hundl5789@gmail.com";  //테스트용 Id와 비번
-            //_pw = "asdf123d";
+            _id = "hundl5789@gmail.com";  //테스트용 Id와 비번
+            _pw = "asdf123d";
             _kakaoPath = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KakaoTalk";
         }
-
-        private void OpenKakao(string title)
+        //TODO: 로직 변경
+        private bool OpenChatRoom(string title)
         {
-            IntPtr H_main_kakao = FindWindow("EVA_Window_Dblclk", null);
-            if (IntPtr.Zero == H_main_kakao)
-            {
-                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(_kakaoPath);
-                string kakao_path = (string)regKey.GetValue("DisplayIcon", "");
-                Process.Start(kakao_path);
-
-                Process[] found = Process.GetProcessesByName("kakaotalk");
-
-                while (found == null || found?.Length == 0)
-                {
-                    found = Process.GetProcessesByName("kakaotalk");
-                    Thread.Sleep(1000);
-                }
-
-                Process kakao = found[0];
-
-                IntPtr edit1 = FindWindowEx(kakao.MainWindowHandle, IntPtr.Zero, "Edit", null);
-                while (edit1 == IntPtr.Zero)
-                {
-                    edit1 = FindWindowEx(kakao.MainWindowHandle, IntPtr.Zero, "Edit", null);
-                    Thread.Sleep(1000);
-                }
-
-                IntPtr edit2 = FindWindowEx(kakao.MainWindowHandle, edit1, "Edit", null);
-                while (edit2 == IntPtr.Zero)
-                {
-                    edit2 = FindWindowEx(kakao.MainWindowHandle, edit1, "Edit", null);
-                    Thread.Sleep(1000);
-                }
-
-                SendMessage(edit1, 0xC, IntPtr.Zero, _id);
-                SendMessage(edit2, 0xC, IntPtr.Zero, _pw);
-
-                PostMessage(edit2, 0x100, new IntPtr(0x0D), IntPtr.Zero);
-                PostMessage(edit2, 0x101, new IntPtr(0x0D), IntPtr.Zero);
-
-                Thread.Sleep(4000);
-            }
-
+            //대화방 열기
             IntPtr hDest = FindWindow("EVA_Window_Dblclk", null); // 메인윈도우 
             if (hDest != IntPtr.Zero)
             {
@@ -114,15 +75,67 @@ namespace ServerMonitoring.ViewModels
                     }
                 }
             }
+            return false;
+        }
+
+        private void OpenKakao(string title)
+        {
+            //카톡 열기
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(_kakaoPath);
+            string kakao_path = (string)regKey.GetValue("DisplayIcon", "");
+            Process.Start(kakao_path);
+
+            Process[] found;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            do
+            {
+                Thread.Sleep(1000);
+                found = Process.GetProcessesByName("kakaotalk");
+                Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
+                if (stopwatch.Elapsed.TotalSeconds > 10)
+                    return;
+            }
+            while (found == null || found?.Length == 0);
+            stopwatch.Stop();
+            Process kakao = found[0];
+
+            IntPtr edit1, edit2;
+            stopwatch.Start();
+
+            do
+            {
+                Thread.Sleep(1000);
+                edit1 = FindWindowEx(kakao.MainWindowHandle, IntPtr.Zero, "Edit", null);
+                edit2 = FindWindowEx(kakao.MainWindowHandle, edit1, "Edit", null);
+                if (stopwatch.Elapsed.TotalSeconds > 10)
+                    return;
+            }
+            while (edit1 == IntPtr.Zero || edit2 == IntPtr.Zero);
+            stopwatch.Stop();
+
+
+            SendMessage(edit1, 0xC, IntPtr.Zero, _id);
+            SendMessage(edit2, 0xC, IntPtr.Zero, _pw);
+
+            PostMessage(edit2, 0x100, new IntPtr(0x0D), IntPtr.Zero);
+            PostMessage(edit2, 0x101, new IntPtr(0x0D), IntPtr.Zero);
+
+            Thread.Sleep(4000);
         }
 
         public bool SendSms(string title, string msg)
         {
             bool isSend = false;
+
+            //Process[] found = Process.GetProcessesByName("kakaotalk");
+            //if (found == null || found?.Length == 0)
+                OpenKakao(title);
+
             IntPtr h_myroom = FindWindow(null, title);
             if (h_myroom == IntPtr.Zero)
             {
-                OpenKakao(title);
+                OpenChatRoom(title);
                 h_myroom = FindWindow(null, title);
             }
 

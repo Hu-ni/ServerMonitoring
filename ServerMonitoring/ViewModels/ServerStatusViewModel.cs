@@ -12,11 +12,11 @@ using System.Net.NetworkInformation;
 
 namespace ServerMonitoring.ViewModels
 {
-    enum ServerStatus
+    public enum ServerStatus
     {
         DB_SUCESS, DB_FAILED, NO_PAGE
     }
-    class ServerStatusViewModel
+    public class ServerStatusViewModel
     {
         private List<ServerInfo> servers;
         private ServerXmlFile xml;
@@ -54,9 +54,9 @@ namespace ServerMonitoring.ViewModels
                         return PingTest(address, index);
                 }
             }
-            catch (Exception)
+            catch (WebException e)
             {
-                servers[index].StatusText = "Program Error!!";
+                servers[index].StatusText = e.Message;
             }
 
             return servers[index];
