@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ServerMonitoring.Models
 {
-    public class ServerInfo
+    public class ServerInfo : INotifyPropertyChanged
     {
         private string _name;
         private string _url;
@@ -30,6 +31,16 @@ namespace ServerMonitoring.Models
             IsDBAccess = isDBAccess;
             DbUrl = dbUrl ?? throw new ArgumentNullException(nameof(dbUrl));
             StatusText = "";
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public override string ToString() => _name;
+
+        protected void OnPropertyChanged(string info)
+        {
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }

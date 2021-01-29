@@ -1,0 +1,28 @@
+﻿<Window x:Class="ServerMonitoring.Views.ListviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServerMonitoring.Views" xmlns:models="clr-namespace:ServerMonitoring.Models"
+        mc:Ignorable="d"
+        Title="ListviewWindow" Height="450" Width="800">
+    <Window.Resources>
+        <models:ServerList x:Key="ServerList"/>
+        <models:ServerListDataTemplateSelector x:Key="ServerDataTemplateSelector"/>
+        <!--<DataTemplate x:Key="ServerDataTemplate">
+            <Grid>
+                <TextBlock Text="{Binding Path=name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding Path=address}" HorizontalAlignment="Left" Margin="10,0,0,42.07" FontSize="9" Foreground="#FF5B5B5B" Height="21.97" VerticalAlignment="Bottom"/>
+                <Ellipse Margin="182.667,21.333,10,0" Height="7.333" VerticalAlignment="Top" Style="{DynamicResource Status_Failed}">
+                </Ellipse>
+            </Grid>
+        </DataTemplate>-->
+    </Window.Resources>
+    <Grid>
+        <local:ServerStatusViewUC HorizontalAlignment="Right" Width="592" Height="419" VerticalAlignment="Top"/>
+        <ListBox HorizontalAlignment="Left" Height="419" VerticalAlignment="Top" Width="200" SelectionMode="Single"
+                 ItemsSource="{Binding Source={StaticResource ServerList}}"
+                Style="{StaticResource ServerDataTemplate}">
+        </ListBox>
+    </Grid>
+</Window>

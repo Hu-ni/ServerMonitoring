@@ -27,6 +27,7 @@ namespace ServerMonitoring.ViewModels
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
+        private string _name;
         private string _id;
         private string _pw;
         private string _kakaoPath;
@@ -35,12 +36,16 @@ namespace ServerMonitoring.ViewModels
         private const int SW_SHOWMINIMIZED = 2;
         private const int SW_SHOWMAXIMIZED = 3;
 
+        public string Name { get => _name; set => _name = value; }
+        public string Id { get => _id; set => _id = value; }
+        public string Pw { get => _pw; set => _pw = value; }
+
         public SmsManagementViewModel()
         {
-            _id = "01044982002";
-            _pw = "cic2016*";
-            _id = "hundl5789@gmail.com";  //테스트용 Id와 비번
-            _pw = "asdf123d";
+            Id = "01044982002";
+            Pw = "cic2016*";
+            Id = "hundl5789@gmail.com";  //테스트용 Id와 비번
+            Pw = "asdf123d";
             _kakaoPath = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KakaoTalk";
         }
         //TODO: 로직 변경
@@ -115,13 +120,11 @@ namespace ServerMonitoring.ViewModels
             stopwatch.Stop();
 
 
-            SendMessage(edit1, 0xC, IntPtr.Zero, _id);
-            SendMessage(edit2, 0xC, IntPtr.Zero, _pw);
+            SendMessage(edit1, 0xC, IntPtr.Zero, Id);
+            SendMessage(edit2, 0xC, IntPtr.Zero, Pw);
 
             PostMessage(edit2, 0x100, new IntPtr(0x0D), IntPtr.Zero);
             PostMessage(edit2, 0x101, new IntPtr(0x0D), IntPtr.Zero);
-
-            Thread.Sleep(4000);
         }
 
         public bool SendSms(string title, string msg)

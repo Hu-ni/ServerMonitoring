@@ -41,13 +41,14 @@ namespace ServerMonitoring.Views
         private string _name;
 
         public ServerStatusViewModel Server { get => server; private set => server = value; }
-        
+        public SmsManagementViewModel Sms { get => sms; private set => sms = value; }
+
         public MainWindow()
         {
             InitializeComponent();
             
             server = new ServerStatusViewModel();
-            sms = new SmsManagementViewModel();
+            Sms = new SmsManagementViewModel();
             ni = new NotifyIcon();
 
             RefreshServerList();
@@ -134,7 +135,7 @@ namespace ServerMonitoring.Views
                 await PrintLog(log);
                 if (!status.StatusText.Equals("Working"))
                 {
-                    if (sms.SendSms(_name, log))
+                    if (Sms.SendSms(_name, log))
                         await PrintLog("문자를 성공적으로 전송했습니다.");
                     else
                         await PrintLog("문자 전송에 실패했습니다.");
@@ -178,7 +179,7 @@ namespace ServerMonitoring.Views
 
             //if (!status.StatusText.Equals("Working"))
             //{
-                if (sms.SendSms(_name, log))
+                if (Sms.SendSms(_name, log))
                     await PrintLog("문자를 성공적으로 전송했습니다.");
                 else
                     await PrintLog("문자 전송에 실패했습니다.");
@@ -212,6 +213,13 @@ namespace ServerMonitoring.Views
             ni.Visible = true;
             this.Visibility = Visibility.Collapsed;
             e.Cancel = true;
+        }
+
+        private void btn_acManager_Click(object sender, RoutedEventArgs e)
+        {
+            KakaoTalkAccountManageView accountManageView = new KakaoTalkAccountManageView();
+            accountManageView.main = this;
+            accountManageView.Show();
         }
     }
 }

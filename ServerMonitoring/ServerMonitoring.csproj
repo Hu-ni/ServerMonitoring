@@ -66,7 +66,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\ServerList.cs" />
+    <Compile Include="Models\ServerListDataTemplateSelector.cs" />
+    <Compile Include="Views\ServerBlockListItem.xaml.cs">
+      <DependentUpon>ServerBlockListItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ServerStatusViewUC.xaml.cs">
+      <DependentUpon>ServerStatusViewUC.xaml</DependentUpon>
+    </Compile>
     <Page Include="Styles\placeholderTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\ServerItemStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -75,6 +87,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\KakaoTalkAccountManageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ListviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -96,10 +112,21 @@
     <Compile Include="Views\KakaoTalkAccountManageView.xaml.cs">
       <DependentUpon>KakaoTalkAccountManageView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ListviewWindow.xaml.cs">
+      <DependentUpon>ListviewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ServerBlockListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ServerStatusViewUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

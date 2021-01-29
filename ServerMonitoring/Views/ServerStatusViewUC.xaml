@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="ServerMonitoring.Views.ServerStatusViewUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ServerMonitoring.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" Width="600">
+    <Grid>
+        <Label x:Name="lb_sn" Content="Server Name" HorizontalAlignment="Left" Margin="28.561,48.686,0,0" VerticalAlignment="Top" Width="252.32"/>
+        <Label x:Name="lb_ss" Content="Server Status" HorizontalAlignment="Left" Margin="28.56,105.606,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lb_ia" Content="IP Address" HorizontalAlignment="Left" Margin="28.56,74.646,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lb_db" Content="DB" HorizontalAlignment="Left" Margin="255.27,105.606,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="tb_log" Height="218" Margin="25.5,137.71,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" HorizontalAlignment="Left" Width="549.333">
+            <TextBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform AngleY="-0.334"/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="-1.994"/>
+                </TransformGroup>
+            </TextBox.RenderTransform>
+        </TextBox>
+        <Button x:Name="btn_edit" Content="변경" HorizontalAlignment="Left" Margin="496.667,54.686,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="btn_select" Content="조회" Margin="0,0,28.333,10" HorizontalAlignment="Right" Width="75" Height="19.96" VerticalAlignment="Bottom"/>
+
+    </Grid>
+</UserControl>

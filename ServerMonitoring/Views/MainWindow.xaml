@@ -12,6 +12,6 @@
         <TextBox x:Name="tb_actionLog" Margin="29,52,31,48" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"  TextWrapping="WrapWithOverflow" IsReadOnly="True" TextChanged="tb_actionLog_TextChanged"/>
         <Button x:Name="btn_addServer" Content="추가" Margin="645,10,98,375" RenderTransformOrigin="1.066,0.442" Click="btn_addServer_Click"/>
         <Button x:Name="btn_deleteServer" Content="삭제" Margin="711,10,31,375" RenderTransformOrigin="0.551,-1.201" Click="btn_deleteServer_Click"/>
-
+        <Button x:Name="btn_acManager" Content="카톡 계정 변경" Margin="131,376,576,10" Click="btn_acManager_Click"/>
     </Grid>
 </Window>
