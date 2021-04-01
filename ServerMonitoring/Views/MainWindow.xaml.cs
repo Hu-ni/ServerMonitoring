@@ -1,4 +1,9 @@
-﻿using ServerMonitoring.Models;
+﻿using GalaSoft.MvvmLight;
+using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using ServerMonitoring.Models;
+using ServerMonitoring.Services;
 using ServerMonitoring.ViewModels;
 using ServerMonitoring.Views;
 using System;
@@ -31,24 +36,32 @@ namespace ServerMonitoring.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        public ViewModelBase ViewModel
+        {
+            get => DataContext as ViewModelBase;
+            set => DataContext = value;
+        }
+
         // 시스템 트레이 추가
         // UI 직관적으로 변경
         // 카카오톡 설정 추가
         // 카카오톡 쓰레드로 변경 1
-        private ServerStatusViewModel server;
-        private SmsManagementViewModel sms;
+        private ServerStatusService server;
+        private SmsManagementService sms;
         private NotifyIcon ni;
         private string _name;
 
-        public ServerStatusViewModel Server { get => server; private set => server = value; }
-        public SmsManagementViewModel Sms { get => sms; private set => sms = value; }
+        public ServerStatusService Server { get => server; private set => server = value; }
+        public SmsManagementService Sms { get => sms; private set => sms = value; }
+
+        public KakaoApiService kakaoApi { get; set; } = new KakaoApiService(new KakaoData());
 
         public MainWindow()
         {
             InitializeComponent();
             
-            server = new ServerStatusViewModel();
-            Sms = new SmsManagementViewModel();
+            server = new ServerStatusService();
+            Sms = new SmsManagementService();
             ni = new NotifyIcon();
 
             RefreshServerList();
@@ -87,7 +100,7 @@ namespace ServerMonitoring.Views
             menu.MenuItems.Add(item1);    // Menu 객체에 각각의 menu 등록
             menu.MenuItems.Add(item2);    // Menu 객체에 각각의 menu 등록
 
-            ni.Icon = new System.Drawing.Icon("setting.ico");    // 아이콘 등록 1번째 방법
+            ni.Icon = Properties.Resources.monitoring;    // 아이콘 등록 1번째 방법
             ni.Visible = true;
             ni.DoubleClick += delegate (object senders, EventArgs args)    // Tray icon의 더블 클릭 이벤트 등록
             {
@@ -99,11 +112,9 @@ namespace ServerMonitoring.Views
         public void Method1() 
         {
             this.Visibility = Visibility.Visible;
-            MessageBox.Show("Method1");
         }
         public void Method2() 
         {
-            MessageBox.Show("Method2");
             Process.GetCurrentProcess().Close();
         }
         public void DoubleMethod() 
@@ -114,13 +125,17 @@ namespace ServerMonitoring.Views
 
         private void tm_saveLog_Tick(object sender, EventArgs e)
         {
-            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
+            if(!Directory.Exists(@"./" + DateTime.Now.ToString("yyyyMMdd")))
+                Directory.CreateDirectory(@"./" + DateTime.Now.ToString("yyyyMMdd"));
+            File.WriteAllText(@"./" + DateTime.Now.ToString("yyyyMMdd") + "/Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
             tb_actionLog.Clear();
         }
 
         private void P_Exited(object sender, EventArgs e)
         {
-            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
+            if (!Directory.Exists(@"./" + DateTime.Now.ToString("yyyyMMdd")))
+                Directory.CreateDirectory(@"./" + DateTime.Now.ToString("yyyyMMdd"));
+            File.WriteAllText(@"./"+DateTime.Now.ToString("yyyyMMdd")+"/Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
         }
 
         private async void tm_checkServer_Tick(object sender, EventArgs e)
@@ -130,19 +145,30 @@ namespace ServerMonitoring.Views
                 return;
             for (int i = 0; i < serverList.Count; i++)
             {
-                ServerInfo status = server.SelectServerStatus(i);
+                ServerInfo status = await server.SelectServerStatus(i);
                 string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
                 await PrintLog(log);
                 if (!status.StatusText.Equals("Working"))
                 {
-                    if (Sms.SendSms(_name, log))
+                    JObject SendJson = new JObject();
+                    JObject LinkJson = new JObject();
+
+                    LinkJson.Add("web_url", status.Url);
+                    LinkJson.Add("mobile_web_url", status.Url);
+
+                    SendJson.Add("object_type", "text");
+                    SendJson.Add("text", log);
+                    SendJson.Add("link", LinkJson);
+                    SendJson.Add("button_title", "사이트 바로가기");
+
+                    IRestResponse response = kakaoApi.KakaoDefaultSendMessage(SendJson);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
                         await PrintLog("문자를 성공적으로 전송했습니다.");
                     else
                         await PrintLog("문자 전송에 실패했습니다.");
                 }
             }
         }
-
 
         public void RefreshServerList()
         {
@@ -173,17 +199,26 @@ namespace ServerMonitoring.Views
 
         private async void btn_serverSelect_Click(object sender, RoutedEventArgs e)
         {
-            ServerInfo status = server.SelectServerStatus(cb_serverList.SelectedIndex);
+            ServerInfo status = await server.SelectServerStatus(cb_serverList.SelectedIndex);
             string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
             await PrintLog(log);
 
-            //if (!status.StatusText.Equals("Working"))
-            //{
-                if (Sms.SendSms(_name, log))
-                    await PrintLog("문자를 성공적으로 전송했습니다.");
-                else
-                    await PrintLog("문자 전송에 실패했습니다.");
-            //}
+            JObject SendJson = new JObject();
+            JObject LinkJson = new JObject();
+
+            LinkJson.Add("web_url", status.Url);
+            LinkJson.Add("mobile_web_url", status.Url);
+
+            SendJson.Add("object_type", "text");
+            SendJson.Add("text", log);
+            SendJson.Add("link", LinkJson);
+            SendJson.Add("button_title", "사이트 바로가기");
+
+            IRestResponse response = kakaoApi.KakaoDefaultSendMessage(SendJson);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                await PrintLog("문자를 성공적으로 전송했습니다.");
+            else
+                await PrintLog("문자 전송에 실패했습니다.");
         }
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -210,16 +245,118 @@ namespace ServerMonitoring.Views
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            ni.Visible = true;
-            this.Visibility = Visibility.Collapsed;
-            e.Cancel = true;
+            if (MessageBox.Show("프로그램을 종료하시겠습니까?", "YesOrNo", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            {
+                ni.Visible = true;
+                this.Visibility = Visibility.Collapsed;
+                e.Cancel = true;
+            }
         }
 
         private void btn_acManager_Click(object sender, RoutedEventArgs e)
         {
-            KakaoTalkAccountManageView accountManageView = new KakaoTalkAccountManageView();
-            accountManageView.main = this;
+            KakaoLoginWindow accountManageView = new KakaoLoginWindow(kakaoApi);
             accountManageView.Show();
+        }
+
+        private void btn_acManager_Click2(object sender, RoutedEventArgs e)
+        {
+            kakaoApi.KakaoTalkLogOut();
+        }
+
+        private void WebBrowserVersionSetting()
+        {
+            RegistryKey registryKey = null; // 레지스트리 변경에 사용 될 변수
+
+            int browserver = 0;
+            int ie_emulation = 0;
+            var targetApplication = Process.GetCurrentProcess().ProcessName + ".exe"; // 현재 프로그램 이름
+
+            // 사용자 IE 버전 확인
+            using (System.Windows.Forms.WebBrowser wb = new System.Windows.Forms.WebBrowser())
+            {
+                browserver = wb.Version.Major;
+                if (browserver >= 11)
+                    ie_emulation = 11001;
+                else if (browserver == 10)
+                    ie_emulation = 10001;
+                else if (browserver == 9)
+                    ie_emulation = 9999;
+                else if (browserver == 8)
+                    ie_emulation = 8888;
+                else
+                    ie_emulation = 7000;
+            }
+
+            try
+            {
+                registryKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+
+                // IE가 없으면 실행 불가능
+                if (registryKey == null)
+                {
+                    MessageBox.Show("웹 브라우저 버전 초기화에 실패했습니다..!");
+                    System.Windows.Forms.Application.Exit();
+                    return;
+                }
+
+                string FindAppkey = Convert.ToString(registryKey.GetValue(targetApplication));
+
+                // 이미 키가 있다면 종료
+                if (FindAppkey == ie_emulation.ToString())
+                {
+                    registryKey.Close();
+                    return;
+                }
+
+                // 키가 없으므로 키 셋팅
+                registryKey.SetValue(targetApplication, unchecked((int)ie_emulation), RegistryValueKind.DWord);
+
+                // 다시 키를 받아와서
+                FindAppkey = Convert.ToString(registryKey.GetValue(targetApplication));
+
+                // 현재 브라우저 버전이랑 동일 한지 판단
+                if (FindAppkey == ie_emulation.ToString())
+                {
+                    return;
+                }
+                else
+                {
+                    MessageBox.Show("웹 브라우저 버전 초기화에 실패했습니다..!");
+                    System.Windows.Forms.Application.Exit();
+                    return;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("웹 브라우저 버전 초기화에 실패했습니다..!");
+                System.Windows.Forms.Application.Exit();
+                return;
+            }
+            finally
+            {
+                // 키 메모리 해제
+                if (registryKey != null)
+                {
+                    registryKey.Close();
+                }
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WebBrowserVersionSetting();
+        }
+
+        public void Send()
+        {
+
+        }
+
+        private void btn_loadFriend_Click(object sender, RoutedEventArgs e)
+        {
+            kakaoApi.KakaoLoadFriendList();
         }
     }
 }

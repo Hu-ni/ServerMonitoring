@@ -10,9 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace ServerMonitoring.ViewModels
+namespace ServerMonitoring.Services
 {
-    public class SmsManagementViewModel
+    public class SmsManagementService
     {
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -40,7 +40,7 @@ namespace ServerMonitoring.ViewModels
         public string Id { get => _id; set => _id = value; }
         public string Pw { get => _pw; set => _pw = value; }
 
-        public SmsManagementViewModel()
+        public SmsManagementService()
         {
             Id = "01044982002";
             Pw = "cic2016*";
@@ -119,10 +119,10 @@ namespace ServerMonitoring.ViewModels
             while (edit1 == IntPtr.Zero || edit2 == IntPtr.Zero);
             stopwatch.Stop();
 
-
+            //ID, PW 입력
             SendMessage(edit1, 0xC, IntPtr.Zero, Id);
             SendMessage(edit2, 0xC, IntPtr.Zero, Pw);
-
+            //데이터 전달 (Enter 키 값)
             PostMessage(edit2, 0x100, new IntPtr(0x0D), IntPtr.Zero);
             PostMessage(edit2, 0x101, new IntPtr(0x0D), IntPtr.Zero);
         }
@@ -131,8 +131,8 @@ namespace ServerMonitoring.ViewModels
         {
             bool isSend = false;
 
-            //Process[] found = Process.GetProcessesByName("kakaotalk");
-            //if (found == null || found?.Length == 0)
+            Process[] found = Process.GetProcessesByName("kakaotalk");
+            if (found == null || found?.Length == 0)
                 OpenKakao(title);
 
             IntPtr h_myroom = FindWindow(null, title);

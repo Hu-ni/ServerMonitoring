@@ -29,7 +29,7 @@ namespace ServerMonitoring.Views
         {
             main.Sms.Name = tb_kakaotalk_name.Text;
             main.Sms.Id = tb_kakaotalk_id.Text;
-            main.Sms.Pw = tb_kakaotalk_pw.Text;
+            main.Sms.Pw = tb_kakaotalk_pw.Password;
             this.Close();
         }
     }

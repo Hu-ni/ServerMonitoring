@@ -1,48 +1,57 @@
 ﻿using ServerMonitoring.Models;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Net.Mail;
-using CoolSms;
 using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
+using ServerMonitoring.Views;
+using System;
+using System.Windows.Forms;
+using System.Threading.Tasks;
 
-namespace ServerMonitoring.ViewModels
+namespace ServerMonitoring.Services
 {
     public enum ServerStatus
     {
         DB_SUCESS, DB_FAILED, NO_PAGE
     }
-    public class ServerStatusViewModel
+    //Viewmodel -> Service
+    //Service에서는 변수를 특정한 경우 외에는 받아오는 것으로
+    public class ServerStatusService
     {
         private List<ServerInfo> servers;
         private ServerXmlFile xml;
         private WebClient client;
 
+
         private readonly string xmlFilePath = @"./server.xml";
 
-        public ServerStatusViewModel()
+        public ServerStatusService()
         {
             xml = new ServerXmlFile(xmlFilePath);
             servers = xml.LoadFile();
             client = new WebClient();
+            client.Encoding = Encoding.UTF8;
+
         }
 
-        public ServerInfo SelectServerStatus(int index)
+        public async Task<ServerInfo> SelectServerStatus(int index)
         {
             //IP 주소를 입력
             string address = servers[index].Url;
-            if (address.Contains("https://"))
-                address = address.Replace("https://", "");
-            else if(address.Contains("http://"))
-                address = address.Replace("http://", "");
-            
+            if (Regex.IsMatch(address, "(?:(ftp|https?|mailto|telnet):\\/\\/)?")) 
+            {
+                address = Regex.Replace(address, "(?:(ftp|https?|mailto|telnet):\\/\\/)?","");   
+                address = "http://" + address;
+            }
             try
             {
-                string htmlText = client.DownloadString("http://" + address + servers[index].DbUrl);
+                //Uri uri = new Uri(address + servers[index].DbUrl);
+                //client.DownloadStringTaskAsync(address + servers[index].DbUrl);
+
+                //Async로 변경 address + servers[index].DbUrl
+                //PropertyChanged event  
+                string htmlText = await client.DownloadStringTaskAsync(address + servers[index].DbUrl);
                 servers[index].StatusText = "";
                 if (servers[index].IsDBAccess)
                 {

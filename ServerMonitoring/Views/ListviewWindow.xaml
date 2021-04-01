@@ -9,14 +9,13 @@
     <Window.Resources>
         <models:ServerList x:Key="ServerList"/>
         <models:ServerListDataTemplateSelector x:Key="ServerDataTemplateSelector"/>
-        <!--<DataTemplate x:Key="ServerDataTemplate">
-            <Grid>
-                <TextBlock Text="{Binding Path=name}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                <TextBlock Text="{Binding Path=address}" HorizontalAlignment="Left" Margin="10,0,0,42.07" FontSize="9" Foreground="#FF5B5B5B" Height="21.97" VerticalAlignment="Bottom"/>
-                <Ellipse Margin="182.667,21.333,10,0" Height="7.333" VerticalAlignment="Top" Style="{DynamicResource Status_Failed}">
-                </Ellipse>
+        <DataTemplate x:Key="ServerDataTemplate">
+            <Grid Background="White">
+                <Label Content="Server Name" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="IP Address" HorizontalAlignment="Left" Margin="10,0,0,42.07" FontSize="9" Foreground="#FF5B5B5B" Height="21.97" VerticalAlignment="Bottom"/>
+                <Ellipse Margin="0,18,18,0" Height="13" VerticalAlignment="Top" HorizontalAlignment="Right" Width="13" x:Name="status" Fill="#FF5BEA5B"/>
             </Grid>
-        </DataTemplate>-->
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <local:ServerStatusViewUC HorizontalAlignment="Right" Width="592" Height="419" VerticalAlignment="Top"/>

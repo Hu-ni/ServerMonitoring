@@ -12,7 +12,7 @@
         <Label Content="PW" HorizontalAlignment="Left" Margin="22,152,0,0" VerticalAlignment="Top"/>
         <Label Content="NAME" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="tb_kakaotalk_id" HorizontalAlignment="Left" Height="25.96" Margin="60.583,100,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="304.417"/>
-        <TextBox x:Name="tb_kakaotalk_pw" HorizontalAlignment="Left" Height="25.96" Margin="60.583,152,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="304.417"/>
+        <PasswordBox x:Name="tb_kakaotalk_pw" HorizontalAlignment="Left" Height="25.96" Margin="60.583,152,0,0" VerticalAlignment="Top" Width="304.417"/>
         <TextBox x:Name="tb_kakaotalk_name" HorizontalAlignment="Left" Height="25.96" Margin="60.583,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="304.417"/>
 
     </Grid>
