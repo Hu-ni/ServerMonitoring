@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -36,26 +37,18 @@ namespace ServerMonitoring.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ViewModelBase ViewModel
-        {
-            get => DataContext as ViewModelBase;
-            set => DataContext = value;
-        }
 
-        // 시스템 트레이 추가
-        // UI 직관적으로 변경
-        // 카카오톡 설정 추가
-        // 카카오톡 쓰레드로 변경 1
+        #region Field
         private ServerStatusService server;
         private SmsManagementService sms;
         private NotifyIcon ni;
-        private string _name;
 
         public ServerStatusService Server { get => server; private set => server = value; }
         public SmsManagementService Sms { get => sms; private set => sms = value; }
-
         public KakaoApiService kakaoApi { get; set; } = new KakaoApiService(new KakaoData());
+        #endregion
 
+        #region Constructor
         public MainWindow()
         {
             InitializeComponent();
@@ -77,9 +70,6 @@ namespace ServerMonitoring.Views
             tm_saveLog.Start();
             Process.GetCurrentProcess().Exited += P_Exited;
 
-            _name = "웹&솔루션 사업팀";
-            _name = "박훈";
-
             ContextMenu menu = new ContextMenu();
             MenuItem item1 = new MenuItem();
             item1.Index = 0;
@@ -87,14 +77,14 @@ namespace ServerMonitoring.Views
 
             item1.Click += delegate (object click, EventArgs eClick)    // menu 의 클릭 이벤트 등록
             {
-                Method1();
+                this.Visibility = Visibility.Visible;
             };
             MenuItem item2 = new MenuItem();    // menu 객체에 들어갈 각 menu
             item2.Index = 1;
             item2.Text = "닫기";    // menu 이름
             item2.Click += delegate (object click, EventArgs eClick)    // menu의 클릭 이벤트 등록
             {
-                Method2();
+                Process.GetCurrentProcess().Close();
             };
 
             menu.MenuItems.Add(item1);    // Menu 객체에 각각의 menu 등록
@@ -104,25 +94,22 @@ namespace ServerMonitoring.Views
             ni.Visible = true;
             ni.DoubleClick += delegate (object senders, EventArgs args)    // Tray icon의 더블 클릭 이벤트 등록
             {
-                DoubleMethod();
+                this.Visibility = Visibility.Visible;
             };
             ni.ContextMenu = menu;    // Menu 객체 등록
             ni.Text = "서버 모니터링 프로그램";    // Tray icon 이름
         }
-        public void Method1() 
-        {
-            this.Visibility = Visibility.Visible;
-        }
-        public void Method2() 
-        {
-            Process.GetCurrentProcess().Close();
-        }
-        public void DoubleMethod() 
-        {
-            this.Visibility = Visibility.Visible;
-        }
+        #endregion
 
+        #region Properties
+        public ViewModelBase ViewModel
+        {
+            get => DataContext as ViewModelBase;
+            set => DataContext = value;
+        }
+        #endregion
 
+        #region Events
         private void tm_saveLog_Tick(object sender, EventArgs e)
         {
             if(!Directory.Exists(@"./" + DateTime.Now.ToString("yyyyMMdd")))
@@ -143,6 +130,13 @@ namespace ServerMonitoring.Views
             List<ServerInfo> serverList = server.GetAllServer();
             if (serverList.Count == 0)
                 return;
+            if (!kakaoApi.RefreshAccessToken())
+            {
+                string log = "인터넷 연결이 불안정합니다.";
+                await PrintLog(log);
+                return;
+            }
+            
             for (int i = 0; i < serverList.Count; i++)
             {
                 ServerInfo status = await server.SelectServerStatus(i);
@@ -161,7 +155,7 @@ namespace ServerMonitoring.Views
                     SendJson.Add("link", LinkJson);
                     SendJson.Add("button_title", "사이트 바로가기");
 
-                    IRestResponse response = kakaoApi.KakaoDefaultSendMessage(SendJson);
+                    IRestResponse response = kakaoApi.KakaoDefaultSendMessageForFreind(SendJson);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                         await PrintLog("문자를 성공적으로 전송했습니다.");
                     else
@@ -170,23 +164,9 @@ namespace ServerMonitoring.Views
             }
         }
 
-        public void RefreshServerList()
-        {
-            List<ComboBoxItem> items = new List<ComboBoxItem>();
-
-            List<ServerInfo> serverList = server.GetAllServer();
-            if (serverList == null)
-                return;
-            for (int i = 0; i < serverList.Count; i++)
-            {
-                items.Add(new ComboBoxItem() { Content = serverList[i].Name });
-            }
-            cb_serverList.ItemsSource = items;
-        }
-
         private void btn_addServer_Click(object sender, RoutedEventArgs e)
         {
-            AddServerView addServerView = new AddServerView();
+            AddServerWindow addServerView = new AddServerWindow();
             addServerView.main = this;
             addServerView.Show();
         }
@@ -199,43 +179,38 @@ namespace ServerMonitoring.Views
 
         private async void btn_serverSelect_Click(object sender, RoutedEventArgs e)
         {
-            ServerInfo status = await server.SelectServerStatus(cb_serverList.SelectedIndex);
-            string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
-            await PrintLog(log);
+            try{
+                ServerInfo status = await server.SelectServerStatus(cb_serverList.SelectedIndex);
+                string log = "현재 " + status.Name + "의 상태는 \"" + status.StatusText + "\"입니다.";
+                await PrintLog(log);
 
-            JObject SendJson = new JObject();
-            JObject LinkJson = new JObject();
+                JObject SendJson = new JObject();
+                JObject LinkJson = new JObject();
 
-            LinkJson.Add("web_url", status.Url);
-            LinkJson.Add("mobile_web_url", status.Url);
+                LinkJson.Add("web_url", status.Url);
+                LinkJson.Add("mobile_web_url", status.Url);
 
-            SendJson.Add("object_type", "text");
-            SendJson.Add("text", log);
-            SendJson.Add("link", LinkJson);
-            SendJson.Add("button_title", "사이트 바로가기");
+                SendJson.Add("object_type", "text");
+                SendJson.Add("text", log);
+                SendJson.Add("link", LinkJson);
+                SendJson.Add("button_title", "사이트 바로가기");
 
-            IRestResponse response = kakaoApi.KakaoDefaultSendMessage(SendJson);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                await PrintLog("문자를 성공적으로 전송했습니다.");
-            else
-                await PrintLog("문자 전송에 실패했습니다.");
+                IRestResponse response = kakaoApi.KakaoDefaultSendMessageForFreind(SendJson);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    await PrintLog("문자를 성공적으로 전송했습니다.");
+                else
+                    await PrintLog("문자 전송에 실패했습니다.");
+            }catch
+            {
+                await PrintLog("서버 상태 불러오는 중에 문제가 생겼습니다.");
+            }
+
         }
 
         private void cb_serverList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(cb_serverList.SelectedItem != null)
                 PrintLog(((ComboBoxItem)cb_serverList.SelectedItem).Content + "를 선택했습니다.");
-        }
-
-        private Task PrintLog(string message)
-        {
-            tb_actionLog.Text += DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ") + message + "\n";
-            return Task.CompletedTask;
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
         }
 
         private void tb_actionLog_TextChanged(object sender, TextChangedEventArgs e)
@@ -245,17 +220,25 @@ namespace ServerMonitoring.Views
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (MessageBox.Show("프로그램을 종료하시겠습니까?", "YesOrNo", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            if (MessageBox.Show("프로그램을 종료하시겠습니까?", "프로그램 종료", MessageBoxButton.YesNo) == MessageBoxResult.No)
             {
                 ni.Visible = true;
                 this.Visibility = Visibility.Collapsed;
                 e.Cancel = true;
+            }
+            else
+            {
+                File.WriteAllText(@"./Server_log_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss") + ".txt", tb_actionLog.Text);
             }
         }
 
         private void btn_acManager_Click(object sender, RoutedEventArgs e)
         {
             KakaoLoginWindow accountManageView = new KakaoLoginWindow(kakaoApi);
+
+            accountManageView.Top = this.Top + (this.ActualHeight - accountManageView.ActualHeight) / 2;
+            accountManageView.Left = this.Left + (this.ActualWidth - accountManageView.ActualWidth) / 2;
+
             accountManageView.Show();
         }
 
@@ -264,6 +247,29 @@ namespace ServerMonitoring.Views
             kakaoApi.KakaoTalkLogOut();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WebBrowserVersionSetting();
+
+            //var viewModel = SimpleIoc.Default.GetInstance<MainViewModel>();
+
+            //ViewModel = viewModel;
+        }
+
+        private void btn_loadFriend_Click(object sender, RoutedEventArgs e)
+        {
+            KakaoTokenWindow tokenView = new KakaoTokenWindow(kakaoApi);
+            tokenView.Show();
+        }
+
+        private void btn_loadFriend_Click2(object sender, RoutedEventArgs e)
+        {
+            kakaoApi.KakaoLoadFriendList();
+        }
+
+        #endregion
+
+        #region Methods
         private void WebBrowserVersionSetting()
         {
             RegistryKey registryKey = null; // 레지스트리 변경에 사용 될 변수
@@ -344,20 +350,27 @@ namespace ServerMonitoring.Views
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private Task PrintLog(string message)
         {
-            WebBrowserVersionSetting();
+            tb_actionLog.Text += DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ") + message + "\n";
+            return Task.CompletedTask;
         }
 
-        public void Send()
+        public void RefreshServerList()
         {
+            List<ComboBoxItem> items = new List<ComboBoxItem>();
 
+            List<ServerInfo> serverList = server.GetAllServer();
+            if (serverList == null)
+                return;
+            for (int i = 0; i < serverList.Count; i++)
+            {
+                items.Add(new ComboBoxItem() { Content = serverList[i].Name });
+            }
+            cb_serverList.ItemsSource = items;
         }
 
-        private void btn_loadFriend_Click(object sender, RoutedEventArgs e)
-        {
-            kakaoApi.KakaoLoadFriendList();
-        }
+        #endregion
     }
 }
 

@@ -123,16 +123,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behavior\OpenKakaoLoginWindowBehavior.cs" />
+    <Compile Include="Behavior\OpenServerRegistrationWindowBehavior.cs" />
     <Compile Include="Constants\KakaoKey.cs" />
+    <Compile Include="Models\Friend.cs" />
     <Compile Include="Models\KakaoData.cs" />
     <Compile Include="Models\ServerList.cs" />
     <Compile Include="Models\ServerListDataTemplateSelector.cs" />
+    <Compile Include="Models\TimeoutWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Service\KakaoApiService.cs" />
     <Compile Include="Service\ServerStatusService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\KakaoLoginWindow.xaml.cs">
       <DependentUpon>KakaoLoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\KakaoTokenWindow.xaml.cs">
+      <DependentUpon>KakaoTokenWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ServerBlockListItem.xaml.cs">
       <DependentUpon>ServerBlockListItem.xaml</DependentUpon>
@@ -160,6 +169,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\KakaoTokenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ListviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -175,7 +188,7 @@
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Models\ServerXmlFIle.cs" />
     <Compile Include="Service\SmsManagementService.cs" />
-    <Compile Include="Views\AddServerView.xaml.cs">
+    <Compile Include="Views\AddServerWindow.cs">
       <DependentUpon>AddServerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\KakaoTalkAccountManageView.xaml.cs">

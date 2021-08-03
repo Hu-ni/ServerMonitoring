@@ -19,17 +19,26 @@ namespace ServerMonitoring.Views
     /// <summary>
     /// AddServerView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AddServerView : Window
+    public partial class AddServerWindow : Window
     {
+        public MainViewModel _main;
         public MainWindow main;
 
         private bool _isChecked;
 
-        public AddServerView()
+        public AddServerWindow()
         {
             InitializeComponent();
             _isChecked = false;
             rbtn_no.IsChecked = true;
+        }
+
+        public AddServerWindow(MainViewModel main)
+        {
+            InitializeComponent();
+            _isChecked = false;
+            rbtn_no.IsChecked = true;
+            this._main = main;
         }
 
         private void btn_add_Click(object sender, RoutedEventArgs e)
@@ -37,8 +46,9 @@ namespace ServerMonitoring.Views
             ServerInfo server = new ServerInfo(tb_name.Text, tb_url.Text, _isChecked, tb_dbAccessUrl.Text);
             main.Server.AddServer(server);
 
-            main.RefreshServerList();
             this.Close();
+
+            //_main.AddServer(server);
         }
 
         private void btn_cancel_Click(object sender, RoutedEventArgs e)

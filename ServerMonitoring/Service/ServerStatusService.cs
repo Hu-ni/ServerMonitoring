@@ -21,7 +21,7 @@ namespace ServerMonitoring.Services
     {
         private List<ServerInfo> servers;
         private ServerXmlFile xml;
-        private WebClient client;
+        private TimeoutWebClient client;
 
 
         private readonly string xmlFilePath = @"./server.xml";
@@ -30,7 +30,7 @@ namespace ServerMonitoring.Services
         {
             xml = new ServerXmlFile(xmlFilePath);
             servers = xml.LoadFile();
-            client = new WebClient();
+            client = new TimeoutWebClient(1500);
             client.Encoding = Encoding.UTF8;
 
         }
@@ -55,7 +55,7 @@ namespace ServerMonitoring.Services
                 servers[index].StatusText = "";
                 if (servers[index].IsDBAccess)
                 {
-                    if (htmlText.Contains("DB Success"))
+                    if (htmlText.Contains("DB Success") || htmlText.Contains("OK"))
                         servers[index].StatusText += "Working";
                     else if (htmlText.Contains("DB Fail") || htmlText.Contains("mysql_connect error"))
                         servers[index].StatusText += "DB Error";

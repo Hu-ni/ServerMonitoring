@@ -13,7 +13,9 @@ namespace ServerMonitoring.Models
         // 유저 데이터
         public string userToken; // 유저 토큰
         public string accessToken; // 에셋 토큰
+        public string refreshToken; // 갱신 토큰
         public string UserNickName; // 사용자 이름
         public Bitmap UserImg; // 사용자 이미지
+        public string[] sendTargets; //메세지 대상
     }
 }

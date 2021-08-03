@@ -16,6 +16,7 @@ namespace ServerMonitoring.Constants
 
         // 로그인 url
         public const string KakaoLogInUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KakaoRestApiKey + "&redirect_uri=" + KakaoRedirectUrl + "&response_type=code";
+        public const string kakaoFriendUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KakaoRestApiKey + "&redirect_uri=" + KakaoRedirectUrl + "&response_type=code&scope=friends";
 
         // 루트 url
         public const string KakaoHostOAuthUrl = "https://kauth.kakao.com";

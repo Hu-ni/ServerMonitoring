@@ -42,10 +42,9 @@ namespace ServerMonitoring.Services
 
         public SmsManagementService()
         {
-            Id = "01044982002";
-            Pw = "cic2016*";
-            Id = "hundl5789@gmail.com";  //테스트용 Id와 비번
-            Pw = "asdf123d";
+            //Id = "카카오톡 아이디";
+            //Pw = "카카오톡 비밀번호";
+          
             _kakaoPath = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KakaoTalk";
         }
         //TODO: 로직 변경

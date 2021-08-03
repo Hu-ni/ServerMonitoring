@@ -17,7 +17,7 @@ namespace ServerMonitoring.ViewModels
 
             //SimpleIoc.Default.ConfigureServices();
 
-            SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register(() => new MainViewModel(serverStatusService, kakaoApiService));
         }
 
         #region ViewModels

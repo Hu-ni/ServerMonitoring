@@ -1,6 +1,7 @@
 ﻿using ServerMonitoring.Constants;
 using ServerMonitoring.Models;
 using ServerMonitoring.Services;
+using ServerMonitoring.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,8 @@ namespace ServerMonitoring.Views
     /// </summary>
     public partial class KakaoLoginWindow : Window
     {
-        KakaoApiService kakaoApi;
+        private KakaoApiService kakaoApi;
+        private MainViewModel main;
 
         public KakaoLoginWindow(KakaoApiService _kakaoApi)
         {
@@ -35,12 +37,28 @@ namespace ServerMonitoring.Views
         {
             if (kakaoApi.GetUserToKen(web_login))
             {
-                Console.WriteLine("토큰 얻기 종료");
-                kakaoApi.GetAccessToKen();
-                Console.WriteLine("aaaa: "+ kakaoApi.Data.accessToken);
+                //Console.WriteLine("토큰 얻기 종료");
+                string content = kakaoApi.GetAccessToKen();
+                Console.WriteLine(content.Contains("friends"));
+
+                if (!content.Contains("friends"))
+                {
+                    KakaoTokenWindow tokenWindow = new KakaoTokenWindow(kakaoApi);
+                    tokenWindow.Top = this.Top + (this.ActualHeight - tokenWindow.ActualHeight) / 2;
+                    tokenWindow.Left = this.Left + (this.ActualWidth - tokenWindow.ActualWidth) / 2;
+                    tokenWindow.ShowDialog();
+                }
+                kakaoApi.KakaoLoadFriendList();
+                //Console.WriteLine("aaaa: "+ kakaoApi.Data.accessToken);
                 this.Close();
             }
+            //main.SetKakaoApi();
+
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+
+        }
     }
 }
